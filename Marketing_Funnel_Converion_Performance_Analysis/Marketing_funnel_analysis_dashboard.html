@@ -1,0 +1,173 @@
+
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='UTF-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0'>
+<title>Marketing Funnel and Conversion Performance Analysis Dashboard</title>
+<script src='https://cdn.plot.ly/plotly-2.35.2.min.js'></script>
+<style>
+body { font-family: Arial, sans-serif; margin: 0; background: #f4f7fb; color: #1f2937; }
+.header { background: linear-gradient(135deg, #0f172a, #1d4ed8); color: white; padding: 32px; }
+.header h1 { margin: 0 0 8px 0; font-size: 34px; }
+.header p { margin: 0; font-size: 16px; max-width: 950px; }
+.wrap { padding: 24px; max-width: 1400px; margin: auto; }
+.kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+.card { background: white; border-radius: 16px; padding: 18px; box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08); }
+.kpi-value { font-size: 30px; font-weight: 700; color: #0f172a; }
+.kpi-label { font-size: 13px; color: #64748b; margin-top: 6px; }
+.grid2 { display: grid; grid-template-columns: 1.2fr 1fr; gap: 20px; margin-bottom: 20px; }
+.grid1 { display: grid; grid-template-columns: 1fr; gap: 20px; margin-bottom: 20px; }
+.section-title { font-size: 24px; margin: 10px 0 16px 0; }
+.chart { height: 420px; }
+.insight { background: #eff6ff; border-left: 5px solid #2563eb; padding: 12px 14px; border-radius: 10px; margin-top: 14px; line-height: 1.5; }
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th, td { padding: 10px 12px; border-bottom: 1px solid #e5e7eb; text-align: left; }
+th { background: #f8fafc; }
+.footer-note { font-size: 13px; color: #64748b; margin-top: 24px; }
+.rec-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.rec-box { background: #ffffff; border-radius: 16px; padding: 18px; box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08); }
+.rec-box h3 { margin-top: 0; }
+.rec-box p { line-height: 1.6; color: #334155; }
+</style>
+</head>
+<body>
+<div class='header'>
+<h1>Marketing Funnel & Conversion Performance Analysis</h1>
+<p>This dashboard analyzes how prospects progress from initial outreach to engagement, qualification, and final conversion using the bank marketing dataset as a lead funnel proxy. It highlights drop-off points, channel quality, timing effects, campaign pressure, and high-converting audience segments.</p>
+</div>
+<div class='wrap'>
+<div class='kpis'>
+<div class='card'><div class='kpi-value'>41,188</div><div class='kpi-label'>Total Contacts</div></div>
+<div class='card'><div class='kpi-value'>49.7%</div><div class='kpi-label'>Contact to Engagement</div></div>
+<div class='card'><div class='kpi-value'>15.1%</div><div class='kpi-label'>Engagement to Qualification</div></div>
+<div class='card'><div class='kpi-value'>11.3%</div><div class='kpi-label'>Actual Campaign Conversion Rate</div></div>
+<div class='card'><div class='kpi-value'>4.5%</div><div class='kpi-label'>Funnel Conversion Rate</div></div>
+</div>
+
+<div class='grid2'>
+<div class='card'>
+<div class='section-title'>Full Funnel Conversion</div>
+<div id='funnel_chart' class='chart'></div>
+<div class='insight'><b>Key insight</b><br>The biggest leakage happens between Engaged and Qualified, where only 15.1% move forward. This means top-of-funnel activity is reasonably healthy, but qualification logic, targeting, and mid-funnel nurturing need the most attention.</div>
+</div>
+<div class='card'>
+<div class='section-title'>Stage Drop-off Rates</div>
+<div id='dropoff_chart' class='chart'></div>
+<div class='insight'><b>Key insight</b><br>The most severe drop-off is not at first contact. It appears after prospects engage, which signals a quality mismatch between initial reach and true sales readiness.</div>
+</div>
+</div>
+
+<div class='grid2'>
+<div class='card'>
+<div class='section-title'>Channel Quality Comparison</div>
+<div id='channel_chart' class='chart'></div>
+<div class='insight'><b>Key insight</b><br>Cellular is the stronger acquisition channel with 4.48% overall conversion versus 0.62% for telephone. The qualification gap is especially large, which makes channel mix one of the fastest optimization levers.</div>
+</div>
+<div class='card'>
+<div class='section-title'>Monthly Conversion Performance</div>
+<div id='month_chart' class='chart'></div>
+<div class='insight'><b>Key insight</b><br>September, October, and December are standout months for customer conversion. These periods likely reflect stronger seasonality and better customer responsiveness, so budget and outreach effort should lean into them.</div>
+</div>
+</div>
+
+<div class='grid2'>
+<div class='card'>
+<div class='section-title'>Conversion by Audience Segment</div>
+<div id='job_chart' class='chart'></div>
+<div class='insight'><b>Key insight</b><br>Students and retirees convert best, suggesting stronger message-market fit in these segments. These groups should receive tailored messaging, while lower-performing segments need revised offers or tighter targeting.</div>
+</div>
+<div class='card'>
+<div class='section-title'>Campaign Pressure vs Conversion</div>
+<div id='campaign_chart' class='chart'></div>
+<div class='insight'><b>Key insight</b><br>Conversion weakens as campaign touch count rises, showing signs of fatigue after early attempts. Repeated follow-ups appear to generate diminishing returns, so teams should test earlier requalification or stop rules.</div>
+</div>
+</div>
+
+<div class='grid1'>
+<div class='card'>
+<div class='section-title'>Detailed Channel Funnel Metrics</div>
+<div class='table-wrap'>
+<table>
+<thead><tr><th>Channel</th><th>Contacted</th><th>Engagement Rate</th><th>Qualification Rate</th><th>Close Rate</th><th>Funnel Conversion</th><th>Avg Duration</th></tr></thead>
+<tbody>
+<tr><td>cellular</td><td>26,144</td><td>50.28%</td><td>21.77%</td><td>40.92%</td><td><b>4.48%</b></td><td>263.5</td></tr><tr><td>telephone</td><td>15,044</td><td>48.77%</td><td>3.07%</td><td>41.33%</td><td><b>0.62%</b></td><td>249.2</td></tr>
+</tbody></table>
+</div>
+<div class='insight'><b>Key insight</b><br>Cellular and telephone have similar close rates once a lead is qualified, but cellular generates far more qualified leads in the first place. That suggests the biggest gain comes from improving lead quality upstream rather than changing closing tactics downstream.</div>
+</div>
+</div>
+
+<div class='rec-grid'>
+<div class='rec-box'>
+<h3>Recommendations to improve conversions</h3>
+<p>Refocus acquisition toward higher-intent channels, especially cellular outreach, because it produces much stronger funnel conversion performance. Rework qualification criteria and nurture flows for engaged leads because that is where the largest leak occurs. Introduce lead scoring before high-cost sales follow-up so the team spends time on prospects with signs of prior success or repeat engagement.</p>
+</div>
+<div class='rec-box'>
+<h3>Recommended optimization priorities</h3>
+<p>Shift campaign budget into peak-response months and highest-converting segments. Reduce excessive repeat contact once attempts pass three to four touches unless fresh intent signals appear. Build tailored offers for students and retirees, then test whether their winning message can be adapted for admin, blue-collar, and technician audiences.</p>
+</div>
+</div>
+
+<div class='footer-note'>Methodology Note: The source dataset contains outreach interactions and conversion outcomes rather than explicit funnel stages. To enable funnel analysis, a proxy funnel was constructed as Contacted → Engaged → Qualified → Customer using call duration, prior campaign outcomes, and final subscription status.</div>
+</div>
+<script>
+var funnelData = [{"stage": "Contacted", "count": 41188, "conversion_rate": 1.0, "drop_off_rate": 0.0, "conversion_pct": 100.0, "dropoff_pct": 0.0}, {"stage": "Engaged", "count": 20483, "conversion_rate": 0.4973050403030009, "drop_off_rate": 0.5026949596969992, "conversion_pct": 49.7, "dropoff_pct": 50.3}, {"stage": "Qualified", "count": 3087, "conversion_rate": 0.15071034516428258, "drop_off_rate": 0.8492896548357174, "conversion_pct": 15.1, "dropoff_pct": 84.9}, {"stage": "Customer", "count": 1264, "conversion_rate": 0.4094590217039197, "drop_off_rate": 0.5905409782960803, "conversion_pct": 40.9, "dropoff_pct": 59.1}];
+var channelData = [{"contact": "cellular", "contacted": 26144, "engaged": 13146, "qualified": 2862, "customers": 1171, "avg_duration": 263.5, "engagement_rate": 50.28, "qualification_rate": 21.77, "close_rate": 40.92, "overall_conversion": 4.48}, {"contact": "telephone", "contacted": 15044, "engaged": 7337, "qualified": 225, "customers": 93, "avg_duration": 249.2, "engagement_rate": 48.77, "qualification_rate": 3.07, "close_rate": 41.33, "overall_conversion": 0.62}];
+var monthData = [{"month": "mar", "contacted": 546, "engaged": 289, "qualified": 112, "customers": 77, "overall_conversion": 14.1}, {"month": "apr", "contacted": 2632, "engaged": 1531, "qualified": 468, "customers": 130, "overall_conversion": 4.94}, {"month": "may", "contacted": 13769, "engaged": 7300, "qualified": 1034, "customers": 228, "overall_conversion": 1.66}, {"month": "jun", "contacted": 5318, "engaged": 2446, "qualified": 180, "customers": 122, "overall_conversion": 2.29}, {"month": "jul", "contacted": 7174, "engaged": 3622, "qualified": 163, "customers": 119, "overall_conversion": 1.66}, {"month": "aug", "contacted": 6178, "engaged": 2584, "qualified": 257, "customers": 163, "overall_conversion": 2.64}, {"month": "sep", "contacted": 570, "engaged": 346, "qualified": 188, "customers": 131, "overall_conversion": 22.98}, {"month": "oct", "contacted": 718, "engaged": 399, "qualified": 187, "customers": 126, "overall_conversion": 17.55}, {"month": "nov", "contacted": 4101, "engaged": 1840, "qualified": 441, "customers": 131, "overall_conversion": 3.19}, {"month": "dec", "contacted": 182, "engaged": 126, "qualified": 57, "customers": 37, "overall_conversion": 20.33}];
+var jobData = [{"job": "student", "contacted": 875, "engaged": 500, "qualified": 177, "customers": 106, "overall_conversion": 12.11}, {"job": "retired", "contacted": 1720, "engaged": 906, "qualified": 240, "customers": 142, "overall_conversion": 8.26}, {"job": "unemployed", "contacted": 1014, "engaged": 497, "qualified": 93, "customers": 53, "overall_conversion": 5.23}, {"job": "unknown", "contacted": 330, "engaged": 162, "qualified": 23, "customers": 12, "overall_conversion": 3.64}, {"job": "admin.", "contacted": 10422, "engaged": 5056, "qualified": 827, "customers": 371, "overall_conversion": 3.56}, {"job": "technician", "contacted": 6743, "engaged": 3233, "qualified": 466, "customers": 220, "overall_conversion": 3.26}, {"job": "housemaid", "contacted": 1060, "engaged": 514, "qualified": 65, "customers": 33, "overall_conversion": 3.11}, {"job": "management", "contacted": 2924, "engaged": 1463, "qualified": 235, "customers": 91, "overall_conversion": 3.11}];
+var campaignData = [{"campaign": 1, "contacted": 17642, "customers": 682, "overall_conversion": 3.87}, {"campaign": 2, "contacted": 10570, "customers": 338, "overall_conversion": 3.2}, {"campaign": 3, "contacted": 5341, "customers": 148, "overall_conversion": 2.77}, {"campaign": 4, "contacted": 2651, "customers": 54, "overall_conversion": 2.04}, {"campaign": 5, "contacted": 1599, "customers": 23, "overall_conversion": 1.44}, {"campaign": 6, "contacted": 979, "customers": 12, "overall_conversion": 1.23}, {"campaign": 7, "contacted": 629, "customers": 4, "overall_conversion": 0.64}, {"campaign": 8, "contacted": 400, "customers": 1, "overall_conversion": 0.25}, {"campaign": 9, "contacted": 283, "customers": 0, "overall_conversion": 0.0}, {"campaign": 10, "contacted": 225, "customers": 2, "overall_conversion": 0.89}];
+
+Plotly.newPlot('funnel_chart', [{
+    type: 'funnel',
+    y: funnelData.map(d => d.stage),
+    x: funnelData.map(d => d.count),
+    text: funnelData.map(d => d.count.toLocaleString()),
+    textposition: 'inside',
+    marker: {color: ['#1d4ed8', '#2563eb', '#60a5fa', '#93c5fd']}
+}], {margin: {l: 80, r: 20, t: 10, b: 30}, paper_bgcolor: 'white', plot_bgcolor: 'white'});
+
+Plotly.newPlot('dropoff_chart', [{
+    type: 'bar',
+    x: funnelData.slice(1).map(d => d.stage),
+    y: funnelData.slice(1).map(d => d.dropoff_pct),
+    text: funnelData.slice(1).map(d => d.dropoff_pct + '%'),
+    textposition: 'outside',
+    marker: {color: ['#60a5fa', '#1d4ed8', '#93c5fd']}
+}], {yaxis: {title: 'Drop-off %'}, margin: {l: 60, r: 20, t: 10, b: 40}, paper_bgcolor: 'white', plot_bgcolor: 'white'});
+
+Plotly.newPlot('channel_chart', [
+    {type: 'bar', name: 'Engagement', x: channelData.map(d => d.contact), y: channelData.map(d => d.engagement_rate), marker: {color: '#93c5fd'}},
+    {type: 'bar', name: 'Qualification', x: channelData.map(d => d.contact), y: channelData.map(d => d.qualification_rate), marker: {color: '#2563eb'}},
+    {type: 'bar', name: 'Overall Conversion', x: channelData.map(d => d.contact), y: channelData.map(d => d.overall_conversion), marker: {color: '#0f172a'}}
+], {barmode: 'group', yaxis: {title: 'Rate %'}, margin: {l: 60, r: 20, t: 10, b: 40}, paper_bgcolor: 'white', plot_bgcolor: 'white'});
+
+Plotly.newPlot('month_chart', [{
+    type: 'scatter',
+    mode: 'lines+markers',
+    x: monthData.map(d => d.month),
+    y: monthData.map(d => d.overall_conversion),
+    line: {color: '#1d4ed8', width: 4},
+    marker: {size: 10, color: '#60a5fa'}
+}], {yaxis: {title: 'Overall Conversion %'}, margin: {l: 60, r: 20, t: 10, b: 40}, paper_bgcolor: 'white', plot_bgcolor: 'white'});
+
+Plotly.newPlot('job_chart', [{
+    type: 'bar',
+    orientation: 'h',
+    y: jobData.map(d => d.job).reverse(),
+    x: jobData.map(d => d.overall_conversion).reverse(),
+    marker: {color: '#2563eb'}
+}], {xaxis: {title: 'Overall Conversion %'}, margin: {l: 90, r: 20, t: 10, b: 40}, paper_bgcolor: 'white', plot_bgcolor: 'white'});
+
+Plotly.newPlot('campaign_chart', [{
+    type: 'scatter',
+    mode: 'lines+markers',
+    x: campaignData.map(d => d.campaign),
+    y: campaignData.map(d => d.overall_conversion),
+    line: {color: '#0f172a', width: 3},
+    marker: {size: 9, color: '#1d4ed8'}
+}], {xaxis: {title: 'Number of Contact Attempts'}, yaxis: {title: 'Overall Conversion %'}, margin: {l: 60, r: 20, t: 10, b: 40}, paper_bgcolor: 'white', plot_bgcolor: 'white'});
+</script>
+</body>
+</html>
